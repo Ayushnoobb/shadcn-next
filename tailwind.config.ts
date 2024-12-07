@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	darkMode: ["class"],
-	content: ["app/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
+	content: ["./src/app/**/*.{ts,tsx}", "./src/components/**/*.{ts,tsx}",'./src/app/*.{tsx,ts}' , './src/views/*.tsx'],
 	theme: {
     	extend: {
     		colors: {
@@ -48,11 +48,6 @@ module.exports = {
     				border: 'hsl(var(--sidebar-border))',
     				ring: 'hsl(var(--sidebar-ring))'
     			}
-    		},
-    		borderRadius: {
-    			lg: '`var(--radius)`',
-    			md: '`calc(var(--radius) - 2px)`',
-    			sm: 'calc(var(--radius) - 4px)'
     		},
     		keyframes: {
     			'accordion-down': {
