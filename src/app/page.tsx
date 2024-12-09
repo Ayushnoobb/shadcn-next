@@ -1,6 +1,6 @@
 'use client'
 import BreadCrumbNav from "@/components/common/BreadCumbNav/BreadCrumbNav";
-import DataTable from "@/components/common/DataTable/DataTable";
+import {DataTable} from "@/components/common/DataTable/DataTable";
 import Paginator from "@/components/common/Pagination/Paginator";
 import CommonContainer from "@/components/elements/CommonContainer";
 import ContentContainer from "@/components/elements/ContentContainer";
@@ -23,7 +23,8 @@ export default function Home() {
               },
             ]}/>
             <ContentContainer>
-              <DataTable />
+              {/* <DataTable /> */}
+              hello
             </ContentContainer>
             <div className="mt-4 w-fit ml-auto">
               <Paginator 

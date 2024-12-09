@@ -19,7 +19,7 @@ interface SelectFieldProps {
   clearSelectValue?: boolean;
   setClearSelectValue?: React.Dispatch<React.SetStateAction<boolean>>;
   isDisabled?: boolean;
-  onChange?: (choice: ChoiceType) => void | any;
+  onChange?: (choice: ChoiceType | any) => void | any;
   loadOptions? :  (inputValue: string, callback: (options: any[]) => void) => Promise<void> | any
   placeHolder? : string
   labelClassName? : string

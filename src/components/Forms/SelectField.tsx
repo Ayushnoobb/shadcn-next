@@ -21,7 +21,7 @@ interface SelectFieldProps {
   clearSelectValue?: Boolean;
   setClearSelectValue?: React.Dispatch<React.SetStateAction<boolean>>;
   isDisabled?: boolean;
-  onChange?: (choice: ChoiceType) => void;
+  onChange?: (choice: ChoiceType | any) => void;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -94,7 +94,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
           value={options.find((option) => option?.value === value)}
           options={options}
           id={id ?? name}
-          className={`w-full ${className}  custom-scrollbar font-normal`}
+          className={`w-full ${className}  custom-scrollbar font-normal dark:bg-transparent`}
           isDisabled={isDisabled}
           onChange={onChange}
           styles={styles}

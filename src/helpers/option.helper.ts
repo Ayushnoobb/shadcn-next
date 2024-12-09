@@ -1,4 +1,4 @@
-export const collectionToOptions = (data: Record<string, any>[]) => {
+export const collectionToOptions = (data: Record<string, string>[]) => {
     return data
       ? data.map((item) => ({
         value: item?.id?.toString() ? item?.id?.toString() : item?.idx,

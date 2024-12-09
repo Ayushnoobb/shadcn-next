@@ -1,13 +1,9 @@
 import { routes } from "@/lib/routes";
 import {
-  Tag,
   Users,
   Settings,
-  Bookmark,
-  SquarePen,
   LayoutGrid,
   LucideIcon,
-  UserRoundCog,
   Split
 } from "lucide-react";
 

@@ -19,7 +19,7 @@ const BranchPageIndex = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
     const AllBrachListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/branch/list`
-    const { data : AllBrachList , isLoading , mutate} = useSWR(AllBrachListURL , defaultFetcher)
+    const { data : AllBrachList  , mutate} = useSWR(AllBrachListURL , defaultFetcher)
     
     return(
         <>
@@ -62,7 +62,7 @@ const BranchPageIndex = () => {
                             <Paginator 
                                 currentPage={1}
                                 totalPages={10}
-                                onPageChange={() => {}}
+                                mutate={mutate}
                                 showPreviousNext
                             />
                         </ContentContainer>

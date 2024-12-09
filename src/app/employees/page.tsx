@@ -13,60 +13,66 @@ import Paginator from "@/components/common/Pagination/Paginator"
 import { useState } from "react"
 import useSWR from "swr"
 import { defaultFetcher } from "@/helpers/fetch.helper"
+import { useSearchParams } from "next/navigation"
 
 const EmployeesIndexPage : React.FC = () => {
 
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(true)
+    const searchParams = useSearchParams()
 
     const AllBrachListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/branch/list`
-    const { data : AllBrachList , isLoading , mutate} = useSWR(AllBrachListURL , defaultFetcher)
+    const { data : AllBrachList , isLoading , mutate} = useSWR(
+        searchParams?.toString() == '' ?  AllBrachListURL : AllBrachListURL.concat(`?${searchParams?.toString()}`) , 
+        defaultFetcher
+    )
+
 
     return(
         <AppContextProvider>
-                <PrivateView>
-                    <CommonContainer>
-                        <div className="flex justify-between items-center">
-                            <div className="">
-                                <PageHeading>Branches</PageHeading>
-                                <BreadCrumbNav breadCrumbItems={[
-                                    {
-                                        title : 'Dashboard',
-                                        href : '/'
-                                    },
-                                    {
-                                        title : 'Employees',
-                                        href : '/employees'
-                                    },
-                                    
-                                ]}/>
-                            </div>
-                            <div>
-                                <Button onClick={() => {setIsModalOpen(true)}}>
-                                    <Plus />
-                                    Add Branch
-                                </Button>
-                            </div>
-                            <EmployeesActionModal
-                                mode="add"
-                                mutate={mutate}
-                                isOpen={isModalOpen}
-                                onOpenChange={setIsModalOpen}
-                            />
+            <PrivateView>
+                <CommonContainer>
+                    <div className="flex justify-between items-center">
+                        <div className="">
+                            <PageHeading>Branches</PageHeading>
+                            <BreadCrumbNav breadCrumbItems={[
+                                {
+                                    title : 'Dashboard',
+                                    href : '/'
+                                },
+                                {
+                                    title : 'Employees',
+                                    href : '/employees'
+                                },
+                                
+                            ]}/>
                         </div>
-                        <ContentContainer>
-                            <EmployeeListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
-                            <Paginator
-                                currentPage={1}
-                                totalPages={10}
-                                onPageChange={() => {}}
-                                showPreviousNext
-                            />
-                        </ContentContainer>
-                        
-                    </CommonContainer>
+                        <div>
+                            <Button onClick={() => {setIsModalOpen(true)}}>
+                                <Plus />
+                                Add Branch
+                            </Button>
+                        </div>
+                        <EmployeesActionModal
+                            mode="add"
+                            mutate={mutate}
+                            isOpen={isModalOpen}
+                            onOpenChange={setIsModalOpen}
+                        />
+                    </div>
+                    <ContentContainer>
+                        <EmployeeListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
+                        <Paginator
+                            currentPage={AllBrachList?.meta?.current_page}
+                            totalPages={AllBrachList?.meta?.current_page}
+                            mutate={mutate}
+                            showPreviousNext
+                        />
+                    </ContentContainer>
+                    
+                </CommonContainer>
 
-                </PrivateView>
-            </AppContextProvider>
+            </PrivateView>
+        </AppContextProvider>
     )
 }
 

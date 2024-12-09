@@ -62,12 +62,16 @@ const DepartmentListIndex = () => {
                             />
                         </div>
                         <ContentContainer>
-                            <DepartmentListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
+                            {
+                                !isLoading ? (
+                                    <DepartmentListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
+                                ) : 'loading ...'
+                            }
                             <Paginator 
                                 currentPage={1}
                                 totalPages={10}
-                                onPageChange={() => {}}
                                 showPreviousNext
+                                mutate={mutate}
                             />
                         </ContentContainer>
                         

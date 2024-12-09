@@ -65,7 +65,7 @@ const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             )}
           >
             {label}
-            {required ? <span className="text-error-400"> *</span> : ""}
+            {required ? <span className="text-red-400"> *</span> : ""}
           </Label>
         )}
         <div className={cn(
