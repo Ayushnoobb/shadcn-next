@@ -4,7 +4,6 @@ import { SidebarToggle } from "@/components/common/Sidebar/_partials/sidebarTogg
 import { Button } from "@/components/ui/button";
 import { SidebarContext } from "@/hooks/use-sidebar";
 import { cn } from "@/lib/utils";
-import { PanelsTopLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useContext } from "react";

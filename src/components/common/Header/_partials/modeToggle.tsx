@@ -14,9 +14,9 @@ import {
 import { useTheme } from "@/hooks/use-theme";
 
 export function ModeToggle() {
+  
   const { toggleTheme, theme } = useTheme();
 
-  console.log(theme)
 
   return (
     <TooltipProvider disableHoverableContent>

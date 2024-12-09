@@ -4,13 +4,14 @@ import AppFooter from "@/components/common/Footer/AppFooter";
 import AppHeader from "@/components/common/Header/AppHeader";
 import { AppSideBar } from "@/components/common/Sidebar/AppSidebar";
 import { useSidebar } from "@/hooks/use-sidebar";
+import isAuthenticated from "@/lib/isAuthenticated";
 import { cn } from "@/lib/utils";
 
-export default function PrivateView({
+const PrivateView = ({
   children
 }: {
   children: React.ReactNode;
-}) {
+}) => {
 
   const sidebar = useSidebar()
   if (!sidebar) return null;
@@ -41,3 +42,5 @@ export default function PrivateView({
     </>
   );
 }
+
+export default isAuthenticated(PrivateView)

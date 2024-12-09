@@ -1,3 +1,4 @@
+import { routes } from "@/lib/routes";
 import {
   Tag,
   Users,
@@ -5,7 +6,9 @@ import {
   Bookmark,
   SquarePen,
   LayoutGrid,
-  LucideIcon
+  LucideIcon,
+  UserRoundCog,
+  Split
 } from "lucide-react";
 
 type Submenu = {
@@ -33,10 +36,9 @@ export function getMenuList(): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/dashboard",
+          href: routes.DASHBOARD_INDEX,
           label: "Dashboard",
           icon: LayoutGrid,
-          submenus: []
         }
       ]
     },
@@ -45,29 +47,25 @@ export function getMenuList(): Group[] {
       menus: [
         {
           href: "",
-          label: "Posts",
-          icon: SquarePen,
+          label: "Employees",
+          icon: Split,
           submenus: [
             {
-              href: "/posts",
-              label: "All Posts"
+              href: routes.EMPLOYEE_INDEX,
+              label: "All Employees"
+            },
+            
+            {
+              href: routes.BRANCH_INDEX,
+              label: "All Branch"
             },
             {
-              href: "/posts/new",
-              label: "New Post"
-            }
+              href: routes.DEPARTMENT_INDEX,
+              label: "All Department"
+            },
           ]
         },
-        {
-          href: "/categories",
-          label: "Categories",
-          icon: Bookmark
-        },
-        {
-          href: "/tags",
-          label: "Tags",
-          icon: Tag
-        }
+
       ]
     },
     {

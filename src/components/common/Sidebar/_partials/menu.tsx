@@ -22,6 +22,7 @@ interface MenuProps {
 }
 
 export function Menu({ isOpen }: MenuProps) {
+  
   const pathname = usePathname();
   const menuList = getMenuList();
 
@@ -96,6 +97,7 @@ export function Menu({ isOpen }: MenuProps) {
                     </div>
                   ) : (
                     <div className="w-full" key={index}>
+                      {/* working */}
                       <CollapseMenuButton
                         icon={Icon}
                         label={label}

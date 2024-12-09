@@ -16,26 +16,30 @@ export default function Paginator({
 }: PaginatorProps) {
 
   return (
-    <Pagination>
-      <PaginationContent>
-        {showPreviousNext && totalPages ? (
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage - 1 < 1}
-            />
-          </PaginationItem>
-        ) : null}
-        {generatePaginationLinks(currentPage, totalPages, onPageChange)}
-        {showPreviousNext && totalPages ? (
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage > totalPages - 1}
-            />
-          </PaginationItem>
-        ): null}
-      </PaginationContent>
-    </Pagination>
+    <div className="w-fit ml-auto mt-4">
+      <Pagination>
+        <PaginationContent>
+          {showPreviousNext && totalPages ? (
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage - 1 < 1}
+                className="cursor-pointer"
+              />
+            </PaginationItem>
+          ) : null}
+          {generatePaginationLinks(currentPage, totalPages, onPageChange)}
+          {showPreviousNext && totalPages ? (
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage > totalPages - 1}
+                className="cursor-pointer"
+              />
+            </PaginationItem>
+          ): null}
+        </PaginationContent>
+      </Pagination>
+    </div>
   )
 }

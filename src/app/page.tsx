@@ -4,12 +4,12 @@ import DataTable from "@/components/common/DataTable/DataTable";
 import Paginator from "@/components/common/Pagination/Paginator";
 import CommonContainer from "@/components/elements/CommonContainer";
 import ContentContainer from "@/components/elements/ContentContainer";
-import SidebarProvider from "@/helpers/contexts/SidebarContextProvider";
+import AppContextProvider from "@/helpers/contexts/AppContextProvider";
 import PrivateView from "@/views/privateView";
 
 export default function Home() {
   return (
-    <SidebarProvider>
+    <AppContextProvider>
         <PrivateView>
           <CommonContainer>
             <BreadCrumbNav breadCrumbItems={[
@@ -35,6 +35,6 @@ export default function Home() {
             </div>
           </CommonContainer>
         </PrivateView>
-    </SidebarProvider>
+    </AppContextProvider>
   );
 }

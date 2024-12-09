@@ -1,85 +1,210 @@
-import { Badge } from "@/components/ui/badge";
+import React, { useState } from "react"
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
-const users = [
-  {
-    id: "USR001",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    id: "USR002",
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    role: "Editor",
-    status: "Inactive",
-  },
-  {
-    id: "USR003",
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    role: "Viewer",
-    status: "Active",
-  },
-  {
-    id: "USR004",
-    name: "Bob Brown",
-    email: "bob.brown@example.com",
-    role: "Editor",
-    status: "Pending",
-  },
-  {
-    id: "USR005",
-    name: "Eve Davis",
-    email: "eve.davis@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-];
+interface DataTableProps<TData> {
+  data: TData[]
+  columns: ColumnDef<TData>[]
+  searchKey?: string
+  showCheckbox?: boolean
+  actionDropdown?: any
+  sn?: number
+}
 
-export default function DataTable() {
+export function DataTable<TData>({
+  data,
+  columns: userColumns,
+  searchKey,
+  showCheckbox = false,
+  actionDropdown , 
+  sn
+}: DataTableProps<TData>) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+  const [selectedRow, setSelectedRow] = useState<TData | null>(null)
+
+  // Construct final columns by conditionally adding checkbox and actions
+  const finalColumns: ColumnDef<TData>[] = React.useMemo(() => {
+    let cols: ColumnDef<TData>[] = []
+    
+    // Add checkbox column if enabled
+    if (showCheckbox) {
+      cols.push({
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      })
+    }
+
+    // Add user-defined columns
+    cols = [...cols, ...userColumns]
+
+    // Add actions column if dropdown is provided
+    if (actionDropdown) {
+      cols.push(actionDropdown)
+    }
+
+    return cols
+  }, [userColumns, showCheckbox, actionDropdown])
+
+  const table = useReactTable({
+    data,
+    columns: finalColumns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  })
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">User ID</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead className="text-right">Status</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {users.map((user) => (
-          <TableRow key={user.id}>
-            <TableCell className="font-medium">{user.id}</TableCell>
-            <TableCell>{user.name}</TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>{user.role}</TableCell>
-            <TableCell className="text-right">
-              <Badge variant={user.status == 'Active' ? 'success' : user.status == 'Pending' ? 'default' : 'destructive' }>
-                {user.status}
-              </Badge>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={4}>Total Users</TableCell>
-          <TableCell className="text-right">{users.length}</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
-  );
+    <div className="w-full">
+      <div className="flex items-center py-4">
+        {searchKey && (
+          <Input
+            placeholder={`Filter ${searchKey}...`}
+            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn(searchKey)?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                )
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {data && table?.getRowModel()?.rows?.length ? (
+              table?.getRowModel()?.rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={finalColumns?.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      {/* Render the modal for the selected row */}
+      {/* {selectedRow && actionDropdown?.items.map((item, index) => {
+        const actionResult = item.action(selectedRow)
+        return actionResult ? React.cloneElement(actionResult as React.ReactElement, { key: index }) : null
+      })} */}
+    </div>
+  )
 }
