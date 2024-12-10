@@ -11,7 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -19,9 +19,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -41,6 +38,7 @@ interface DataTableProps<TData> {
   showCheckbox?: boolean
   actionDropdown?: any
   sn?: number
+  customFilter? : React.ReactNode
 }
 
 export function DataTable<TData>({
@@ -49,15 +47,13 @@ export function DataTable<TData>({
   searchKey,
   showCheckbox = false,
   actionDropdown , 
-  sn
+  customFilter
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-  const [selectedRow, setSelectedRow] = useState<TData | null>(null)
 
-  // Construct final columns by conditionally adding checkbox and actions
   const finalColumns: ColumnDef<TData>[] = React.useMemo(() => {
     let cols: ColumnDef<TData>[] = []
     
@@ -117,16 +113,19 @@ export function DataTable<TData>({
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        {searchKey && (
-          <Input
-            placeholder={`Filter ${searchKey}...`}
-            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn(searchKey)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-        )}
+        <div className="flex gap-2">
+          {searchKey && (
+            <Input
+              placeholder={`Filter ${searchKey}...`}
+              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn(searchKey)?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          )}
+          {customFilter}
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -152,8 +151,8 @@ export function DataTable<TData>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border ">
+        <Table className="custom-scrollbar">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -200,11 +199,6 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      {/* Render the modal for the selected row */}
-      {/* {selectedRow && actionDropdown?.items.map((item, index) => {
-        const actionResult = item.action(selectedRow)
-        return actionResult ? React.cloneElement(actionResult as React.ReactElement, { key: index }) : null
-      })} */}
     </div>
   )
 }

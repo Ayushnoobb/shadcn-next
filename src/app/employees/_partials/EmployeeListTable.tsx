@@ -12,12 +12,14 @@ import {
 }  from "@/components/ui/dropdown-menu"
 import { useState } from "react"
 import EmployeesActionModal from "./EmployeesActionModal"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import EmployeeCustomFilter from "./EmployeeCustomFilter"
 
 const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => void}> = ({
     data , 
-    sn , 
     mutate
 }) => {
+
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [selectedRow, setSelectedRow] = useState(null)
     const columns: ColumnDef<any>[] = [
@@ -43,11 +45,20 @@ const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => voi
                 )
             },
             cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("name")}</div>
+            <div className="capitalize" data-src={row.original.image_path}>
+                <Avatar className="h-8 w-8">
+                {
+                    <AvatarImage src={row.original.image_path ?? 'no image path'} alt={row.getValue("name")} /> 
+                }
+                </Avatar>
+                <span className="mt-2 inline-block">
+                    {row.getValue("name")}
+                </span>
+            </div>
             ),
         },
         {
-            accessorKey: "location",
+            accessorKey: "email",
             header: ({ column } : { column : any }) => {
                 return (
                     <Button
@@ -55,17 +66,17 @@ const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => voi
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                         className="!px-0"
                         >
-                            Location
+                            Email
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
             },
             cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("location")}</div>
+            <div className="">{row.getValue("email")}</div>
             ),
         },
         {
-            accessorKey: "established_date",
+            accessorKey: "mobile",
             header: ({ column } : { column : any }) => {
                 return (
                     <Button
@@ -73,17 +84,17 @@ const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => voi
                         className="!px-0"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                         >
-                            Established Date
+                            Mobile
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
             },
             cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("established_date")}</div>
+            <div className="capitalize">{row.getValue("mobile")}</div>
             ),
         },
         {
-            accessorKey: "contact_number",
+            accessorKey: "gender",
             header: ({ column } : { column : any }) => {
                 return (
                     <Button
@@ -91,13 +102,31 @@ const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => voi
                         className="!px-0"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                         >
-                            Contact
+                            Gender
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
             },
             cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("contact_number")}</div>
+            <div className="">{row.getValue("gender")}</div>
+            ),
+        },
+        {
+            accessorKey: "date_of_birth",
+            header: ({ column } : { column : any }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className="!px-0"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            Date of Birth
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row  } : { row : any }) => (
+            <div className="capitalize">{row.getValue("date_of_birth")}</div>
             ),
         },
     ]
@@ -136,7 +165,7 @@ const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => voi
                       </DropdownMenu>
                     ),
                 }}
-                
+                customFilter={<EmployeeCustomFilter mutate={mutate} />}
             />
             <EmployeesActionModal
                 mode="edit"

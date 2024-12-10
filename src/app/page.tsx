@@ -1,13 +1,16 @@
 'use client'
 import BreadCrumbNav from "@/components/common/BreadCumbNav/BreadCrumbNav";
-import {DataTable} from "@/components/common/DataTable/DataTable";
 import Paginator from "@/components/common/Pagination/Paginator";
 import CommonContainer from "@/components/elements/CommonContainer";
 import ContentContainer from "@/components/elements/ContentContainer";
 import AppContextProvider from "@/helpers/contexts/AppContextProvider";
 import PrivateView from "@/views/privateView";
 
+
 export default function Home() {
+
+
+
   return (
     <AppContextProvider>
         <PrivateView>
@@ -23,15 +26,15 @@ export default function Home() {
               },
             ]}/>
             <ContentContainer>
-              {/* <DataTable /> */}
-              hello
+              {/* <MultiStepForm steps={steps} renderContent={renderContent}/> */}
+              Hello
             </ContentContainer>
             <div className="mt-4 w-fit ml-auto">
               <Paginator 
                 currentPage={1}
                 totalPages={10}
-                onPageChange={() => {}}
                 showPreviousNext
+                mutate={() => {}}
               />
             </div>
           </CommonContainer>

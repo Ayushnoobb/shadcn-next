@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
 
-export const useLocalStorage = <T,>(key: string, initialValue: T) => {
+export const useLocalStorage = <T,>(key: string, initialValue?: T) => {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
+      console.log(item)
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.error(error);
@@ -22,5 +23,9 @@ export const useLocalStorage = <T,>(key: string, initialValue: T) => {
     }
   };
 
-  return [storedValue, setValue] as const;
+  const removeValue = (key : string) => {
+    window.localStorage.removeItem(key)
+  }
+
+  return [storedValue, setValue , removeValue ] as const;
 };

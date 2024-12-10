@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 interface ProfileImageUploadProps {
-  imagePath? : string
+  imagePath? : string | null
   onImageUpload? : (file : File) => void
 }
 

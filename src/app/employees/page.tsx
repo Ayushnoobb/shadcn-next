@@ -17,15 +17,16 @@ import { useSearchParams } from "next/navigation"
 
 const EmployeesIndexPage : React.FC = () => {
 
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(true)
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const searchParams = useSearchParams()
 
-    const AllBrachListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/branch/list`
+    const AllBrachListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/employee/list`
     const { data : AllBrachList , isLoading , mutate} = useSWR(
         searchParams?.toString() == '' ?  AllBrachListURL : AllBrachListURL.concat(`?${searchParams?.toString()}`) , 
         defaultFetcher
     )
 
+    console.log(AllBrachList)
 
     return(
         <AppContextProvider>
@@ -33,7 +34,7 @@ const EmployeesIndexPage : React.FC = () => {
                 <CommonContainer>
                     <div className="flex justify-between items-center">
                         <div className="">
-                            <PageHeading>Branches</PageHeading>
+                            <PageHeading>Employees</PageHeading>
                             <BreadCrumbNav breadCrumbItems={[
                                 {
                                     title : 'Dashboard',
@@ -49,7 +50,7 @@ const EmployeesIndexPage : React.FC = () => {
                         <div>
                             <Button onClick={() => {setIsModalOpen(true)}}>
                                 <Plus />
-                                Add Branch
+                                Add Employees
                             </Button>
                         </div>
                         <EmployeesActionModal

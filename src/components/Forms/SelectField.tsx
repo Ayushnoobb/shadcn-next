@@ -1,7 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import Select  from "react-select";
-import { ChoiceType } from "@/helpers/commonSchema/common.schema";
-import { Label } from "../ui/label";
+import React, { useEffect, useRef } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface SelectFieldProps {
   className?: string;
@@ -10,18 +16,18 @@ interface SelectFieldProps {
   labelStyle?: string;
   labelWidth?: string;
   name: string;
-  labelClassName? : string
-  placeholder?:string;
+  labelClassName?: string;
+  placeholder?: string;
   defaultValue?: string | number | boolean;
   value?: string | number | boolean;
   required?: boolean;
   wrapperClassName?: string;
   options: { value: string | number; label: string }[];
   fieldErrors?: Array<string>;
-  clearSelectValue?: Boolean;
+  clearSelectValue?: boolean;
   setClearSelectValue?: React.Dispatch<React.SetStateAction<boolean>>;
   isDisabled?: boolean;
-  onChange?: (choice: ChoiceType | any) => void;
+  onChange?: (value: string) => void;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -29,11 +35,10 @@ const SelectField: React.FC<SelectFieldProps> = ({
   id,
   label,
   labelStyle,
-  labelWidth,
   name,
   defaultValue,
   value,
-  placeholder,
+  placeholder = `Select ${label}`,
   required,
   options,
   wrapperClassName = "",
@@ -44,67 +49,72 @@ const SelectField: React.FC<SelectFieldProps> = ({
   onChange,
   labelClassName
 }) => {
-  if (labelStyle === "label-left") {
-    wrapperClassName = wrapperClassName.concat(
-      " ",
-      " flex justify-between items-center gap-2 "
-    );
-  }
-  const selectRef = useRef<any>(null);
+  const selectRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (clearSelectValue === true) {
-      selectRef?.current?.clearValue?.();
-      setClearSelectValue && setClearSelectValue(false);
+      onChange?.("");
+      setClearSelectValue?.(false);
     }
-  }, [clearSelectValue , setClearSelectValue]);
-  const styles = {
-    menuList: (base : any) => ({
-      ...base,
+  }, [clearSelectValue, setClearSelectValue, onChange]);
 
-      "::-webkit-scrollbar": {
-        width: "5px",
-      },
-      "::-webkit-scrollbar-track": {
-        background: "#f1f1f1",
-      },
-      "::-webkit-scrollbar-thumb": {
-        background: "#d1d1d1",
-      },
-      "::-webkit-scrollbar-thumb:hover": {
-        background: "#555",
-      },
-    }),
-  };
+  const wrapperClasses = cn(
+    wrapperClassName,
+    labelStyle === "label-left" && "flex justify-between items-center gap-2"
+  );
 
   return (
-    <div className={`${wrapperClassName} `}>
+    <div className={wrapperClasses}>
       {label && (
-        <Label id={id ?? name} className="">
+        <Label 
+          htmlFor={id ?? name} 
+          className={cn(labelClassName)}
+        >
           {label}
-          {required ? <span className="text-error-400"> *</span> : ""}
+          {required && <span className="text-destructive ml-1">*</span>}
         </Label>
       )}
 
-      <div className={`w-full ${labelStyle !== "label-left" &&  'mt-2'} `}>
+      <div className={cn(
+        "w-full",
+        labelStyle !== "label-left" && "mt-2"
+      )}>
         <Select
-          ref={selectRef}
-          defaultValue={options.find(
-            (option) => option?.value === defaultValue
-          )}
-          value={options.find((option) => option?.value === value)}
-          options={options}
-          id={id ?? name}
-          className={`w-full ${className}  custom-scrollbar font-normal dark:bg-transparent`}
-          isDisabled={isDisabled}
-          onChange={onChange}
-          styles={styles}
-          placeholder={placeholder}
-        />{" "}
-        <span className="block text-error-500 text-xs my-1">
-          {fieldErrors.map((item: string, index: any) => (
-            <span key={index}>{item}</span>
-          ))}
-        </span>
+          defaultValue={defaultValue?.toString()}
+          value={value?.toString()}
+          onValueChange={onChange}
+          disabled={isDisabled}
+        >
+          <SelectTrigger 
+            ref={selectRef}
+            className={cn(
+              "w-full font-normal",
+              className
+            )}
+            id={id ?? name}
+          >
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent className="max-h-[200px]">
+            {options.map((option) => (
+              <SelectItem 
+                key={option.value} 
+                value={option.value.toString()}
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {fieldErrors.map((error, index) => (
+          <span 
+            key={index} 
+            className="block text-destructive text-xs mt-1"
+          >
+            {error}
+          </span>
+        ))}
       </div>
     </div>
   );
