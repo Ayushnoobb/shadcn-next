@@ -5,15 +5,46 @@ import { useToast } from "@/hooks/use-toast";
 import { FormEvent, useState } from "react";
 import ProfileImageUpload from "../EmployeeProfile";
 import FormInput from "@/components/Forms/InputFields";
+import useSWR from "swr";
+import { defaultFetcher } from "@/helpers/fetch.helper";
+import { collectionToOptions, objectToOptions } from "@/helpers/option.helper";
+import { ChoiceType } from "@/helpers/commonSchema/common.schema";
 
 const GeneralInformation = ({
   changeNext
 } : { changeNext : () => void }) => {
 
+    const { toast } = useToast();
     const [formData, setFormData] = useState<Record<string, any>>({});
     const [isLoading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<Record<string, any>>({});
-    const { toast } = useToast();
+
+    const genderListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/data/gender`
+    const maritalStatusListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/data/marital-status`
+    const bloodGroupListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/data/blood-group`
+    const religionListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/data/religion`
+
+    const {data : genderList} = useSWR(genderListURL , defaultFetcher)
+    const {data : maritalStatusList} = useSWR(maritalStatusListURL , defaultFetcher)
+    const {data : bloodGroupList} = useSWR(bloodGroupListURL , defaultFetcher)
+    const {data : religionList} = useSWR(religionListURL , defaultFetcher)
+
+    const genderOptionList: ChoiceType[] = genderList?.data?.length > 0 
+    ? objectToOptions(genderList?.data) 
+    : [];
+  
+  const maritalOptionList: ChoiceType[] = maritalStatusList?.data?.length > 0 
+    ? objectToOptions(maritalStatusList?.data) 
+    : [];
+  
+  const bloodGroupOptionList: ChoiceType[] = bloodGroupList?.data?.length > 0 
+    ? objectToOptions(bloodGroupList?.data) 
+    : [];
+  
+  const religionOptionList: ChoiceType[] = religionList?.data?.length > 0 
+    ? objectToOptions(religionList?.data) 
+    : [];
+  
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
       const { name, value } = e.target;
@@ -143,12 +174,7 @@ const GeneralInformation = ({
                         label="Gender"
                         id="gender"
                         name="gender"
-                        options={[
-                            { value: "male", label: "Male" },
-                            { value: "female", label: "Female" },
-                            { value: "other", label: "Other" },
-                        ]}
-                        
+                        options={genderOptionList}
                         value={formData.gender}
                         onChange={(e :any) => handleSelectChange('gender',e.value)}
                         fieldErrors={error?.gender}
@@ -161,42 +187,32 @@ const GeneralInformation = ({
                         required
                         value={formData.date_of_birth}
                         onChange={handleInputChange}
-                        error={error?.date_of_birth} />
-                        <SelectField
-                        label="Marital Status"
-                        id="marital_status"
-                        name="marital_status"
-                        options={[
-                            { value: "single", label: "Single" },
-                            { value: "married", label: "Married" },
-                        ]}
-                        value={formData.marital_status}
-                        onChange={(e :any) => handleSelectChange('marital_status',e.value)}
-                        fieldErrors={error?.marital_status}
+                        error={error?.date_of_birth} 
+                      />
+                    <SelectField
+                      label="Marital Status"
+                      id="marital_status"
+                      name="marital_status"
+                      options={maritalOptionList}
+                      value={formData.marital_status}
+                      onChange={(e :any) => handleSelectChange('marital_status',e.value)}
+                      fieldErrors={error?.marital_status}
                     />
-                    <FormInput
+                    <SelectField
                         label="Religion"
                         id="religion"
                         name="religion"
                         value={formData.religion}
-                        onChange={handleInputChange}
-                        error={error?.religion}
+                        options={religionOptionList}
+                        onChange={(e :any) => handleSelectChange('religion',e.value)}
+                        fieldErrors={error?.religion}
                         placeholder="Enter religion"
                     />
                     <SelectField
                         label="Blood Group"
                         id="blood_group"
                         name="blood_group"
-                        options={[
-                            { value: "A+", label: "A+" },
-                            { value: "A-", label: "A-" },
-                            { value: "B+", label: "B+" },
-                            { value: "B-", label: "B-" },
-                            { value: "AB+", label: "AB+" },
-                            { value: "AB-", label: "AB-" },
-                            { value: "O+", label: "O+" },
-                            { value: "O-", label: "O-" },
-                        ]}
+                        options={bloodGroupOptionList}
                         value={formData.blood_group}
                         onChange={(e :any) => handleSelectChange('blood_group',e.value)}
                         fieldErrors={error?.blood_group}

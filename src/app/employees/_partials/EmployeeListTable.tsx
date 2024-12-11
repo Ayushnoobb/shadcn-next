@@ -15,9 +15,10 @@ import EmployeesActionModal from "./EmployeesActionModal"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import EmployeeCustomFilter from "./EmployeeCustomFilter"
 
-const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => void}> = ({
+const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => void , isLoading: boolean}> = ({
     data , 
-    mutate
+    mutate ,
+    isLoading
 }) => {
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -139,6 +140,7 @@ const EmployeeListTable : React.FC<{data : [] , sn : number , mutate : () => voi
                 sn={1}
                 searchKey="name"
                 showCheckbox={false}
+                isLoading={isLoading}
                 actionDropdown={{
                     id: "actions",
                     enableHiding: false,

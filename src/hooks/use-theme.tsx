@@ -12,7 +12,7 @@ export const useTheme = () => {
       return savedTheme;
     }
     
-    // Fall back to system preference
+    // Fall back to system perefered themes 
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   };
 

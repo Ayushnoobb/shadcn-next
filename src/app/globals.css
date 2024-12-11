@@ -132,7 +132,7 @@ input[type=number] {
   background-color: hsl(var(--background)) !important ;
 }
 
-.css-b62m3t-container:hover .css-b62m3t-container > div , .css-b62m3t-container>div{
+.css-b62m3t-container:hover .css-b62m3t-container > div , .css-b62m3t-container>div ,._1oYOS{
   /* @apply text-[hsl(var(--foreground))]; */
   /* color: inherit; */
   @apply text-foreground;
@@ -140,7 +140,7 @@ input[type=number] {
 
 }
 
-.css-b62m3t-container > input {
+.css-b62m3t-container > input , ._1oYOS{
   background-color: hsl(var(--background)) !important ;
 }
 
@@ -153,4 +153,9 @@ input[type=number] {
 }
 .css-ye3aj1{
   color: hasl(var(--input)) !important;
+}
+
+/* smbdkl date picker css */
+._1oYOS{
+  @apply w-full
 }

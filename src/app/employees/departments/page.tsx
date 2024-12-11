@@ -1,7 +1,9 @@
 'use client'
+import { useSearchParams } from "next/navigation"
 import { useState } from "react"
-import { Plus } from "lucide-react"
 import useSWR from "swr"
+import { Plus } from "lucide-react"
+
 
 import PrivateView from "@/views/privateView"
 import BreadCrumbNav from "@/components/common/BreadCumbNav/BreadCrumbNav"
@@ -11,24 +13,25 @@ import { PageHeading } from "@/components/ui/title"
 import Paginator from "@/components/common/Pagination/Paginator"
 import { Button } from "@/components/ui/button"
 
-import DepartmentActionModal from "./_partials/DepartmenActionModal"
-import DepartmentListTable from "./_partials/DepartmnetListTable"
+import DepartmentActionModal from "./_partials/DepartmentActionModal"
+import DepartmentListTable from "./_partials/DepartmentListTable"
 
 import AppContextProvider from "@/helpers/contexts/AppContextProvider"
 import { defaultFetcher } from "@/helpers/fetch.helper"
 import { routes } from "@/lib/routes"
-import { useSearchParams } from "next/navigation"
 
-const DepartmentListIndex = () => {
+const DepartmentListIndex : React.FC = () => {
 
     const searchParams = useSearchParams()
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
-    const AllBrachListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/branch/list`
+    const AllBrachListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/department/list`
     const { data : AllBrachList , isLoading , mutate} = useSWR(
         searchParams.toString() == '' ? AllBrachListURL : AllBrachListURL + `?${searchParams.toString()}` , 
         defaultFetcher
     )
+
+    console.log(AllBrachList)
     
     return(
         <>
@@ -68,13 +71,16 @@ const DepartmentListIndex = () => {
                         </div>
                         <ContentContainer>
                             {
-                                // !isLoading ? (
-                                // ) : 'loading ...'
-                                <DepartmentListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
+                                <DepartmentListTable 
+                                    data={AllBrachList?.data} 
+                                    sn={AllBrachList?.meta?.from} 
+                                    mutate={mutate} 
+                                    isLoading={isLoading}
+                                />
                             }
                             <Paginator 
-                                currentPage={1}
-                                totalPages={10}
+                                currentPage={AllBrachList?.meta?.current_page}
+                                totalPages={AllBrachList?.meta?.last_page}
                                 showPreviousNext
                                 mutate={mutate}
                             />

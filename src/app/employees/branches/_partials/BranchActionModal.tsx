@@ -8,9 +8,11 @@ import {
 } from "@/components/ui/dialog"
 import { hrmsAccessToken } from "@/helpers/token.helper"
 import { useToast } from "@/hooks/use-toast"
-import React, { FormEvent, useEffect, useState } from "react"
+import React, { FormEvent, useContext, useEffect, useState } from "react"
 import FormInput from "@/components/Forms/InputFields"
 import Loader from "@/components/elements/Loader"
+import NepaliDateField from "@/components/Forms/NepaliDateField"
+import { SettingsContext } from "@/helpers/contexts/AppSettingContextProvider"
 
 interface BranchActionModalProps {
   mode: 'add' | 'edit'
@@ -29,6 +31,8 @@ const BranchActionModal: React.FC<BranchActionModalProps> = ({
   isOpen,
   onOpenChange
 }) => {
+
+  const { calendar } = useContext(SettingsContext)
   const [formData, setFormData] = useState<Record<string,any>>(initialData || {})
   const [isLoading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<Record<string ,any>>({})
@@ -73,6 +77,7 @@ const BranchActionModal: React.FC<BranchActionModalProps> = ({
           setFormData({});
           mutate();
           toast({
+            variant : 'success' ,
             title: `Successfully ${mode == 'edit' ? 'Updated !' : 'Created !'}`,
             description: data?.message,
           }); 
@@ -147,18 +152,32 @@ const BranchActionModal: React.FC<BranchActionModalProps> = ({
                     />
                 </div>
                 <div className="">
-                    <FormInput
+                  {
+                    calendar === 'nepali' ? (
+                      <NepaliDateField 
                         label="Established Date"
-                        id="established_date"
-                        name="established_date"
-                        type="date"
-                        labelPosition="top"
-                        value={formData.established_date}
-                        defaultValue={formData?.established_date ?? null}
-                        error={error?.established_date}
-                        onChange={handleInputChange}
-                        placeholder="Enter established_date"
-                    />
+                        onChange={(e  :any) => setFormData((prev : Record<string,any>) => ({...prev , 'established_date_nepali' : e.bsDate}))}
+                        labelStyle="label-top"
+                        id="established_date_nepali"
+                        value={formData.established_date_nepali}
+                        defaultValue={formData?.established_date_nepali ?? null}
+                        fieldErrors={error?.established_date_nepali}
+                      />
+                    ) : (
+                      <FormInput
+                          label="Established Date"
+                          id="established_date"
+                          name="established_date"
+                          type="date"
+                          labelPosition="top"
+                          value={formData.established_date}
+                          defaultValue={formData?.established_date ?? null}
+                          error={error?.established_date}
+                          onChange={handleInputChange}
+                          placeholder="Enter established_date"
+                      />
+                    )
+                  }
                 </div>
             </div>
             <DialogFooter>

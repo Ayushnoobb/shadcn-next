@@ -64,7 +64,7 @@ const DepartmentActionModal: React.FC<DepartmentActionModalProps> = ({
     const handleFormSubmit = async (e : FormEvent<HTMLFormElement>) : Promise<void> => {
         e.preventDefault();
         setLoading(true)
-        const toSendformData = new FormData(e.currentTarget);
+        const toSendformData = new FormData();
         Object.entries(formData).forEach(([key, value]: [string, string], index: number) => {
             // Your logic here
             if(value){
@@ -78,7 +78,8 @@ const DepartmentActionModal: React.FC<DepartmentActionModalProps> = ({
             method : 'POST' , 
             body  : toSendformData , 
             headers : {
-                Authorization : `Bearer ${hrmsAccessToken()}`
+                Authorization : `Bearer ${hrmsAccessToken()}`,
+                Accept : 'Application/json'
             }
             })
             const data = await res.json()
@@ -87,6 +88,7 @@ const DepartmentActionModal: React.FC<DepartmentActionModalProps> = ({
             setFormData({});
             mutate();
             toast({
+                variant : 'success' ,
                 title: `Successfully ${mode == 'edit' ? 'Updated !' : 'Created !'}`,
                 description: data?.message,
             }); 

@@ -11,12 +11,13 @@ import {
     DropdownMenuTrigger,
 }  from "@/components/ui/dropdown-menu"
 import { useState } from "react"
-import DepartmentActionModal from "./DepartmenActionModal"
+import DepartmentActionModal from "./DepartmentActionModal"
 
-const DepartmentListTable : React.FC<{data : [] , sn : number , mutate : () => void}> = ({
+const DepartmentListTable : React.FC<{data : [] , sn : number , mutate : () => void , isLoading : boolean}> = ({
     data , 
     sn , 
-    mutate
+    mutate , 
+    isLoading
 }) => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [selectedRow, setSelectedRow] = useState(null)
@@ -47,7 +48,7 @@ const DepartmentListTable : React.FC<{data : [] , sn : number , mutate : () => v
             ),
         },
         {
-            accessorKey: "location",
+            accessorKey: "Branch",
             header: ({ column } : { column : any }) => {
                 return (
                     <Button
@@ -55,51 +56,16 @@ const DepartmentListTable : React.FC<{data : [] , sn : number , mutate : () => v
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                         className="!px-0"
                         >
-                            Location
+                            Branch
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
             },
             cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("location")}</div>
+            <div className="capitalize">{row.original?.branch?.name}</div>
             ),
         },
-        {
-            accessorKey: "established_date",
-            header: ({ column } : { column : any }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className="!px-0"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            Established Date
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                )
-            },
-            cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("established_date")}</div>
-            ),
-        },
-        {
-            accessorKey: "contact_number",
-            header: ({ column } : { column : any }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className="!px-0"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            Contact
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                )
-            },
-            cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("contact_number")}</div>
-            ),
-        },
+        
     ]
 
     return(
@@ -108,6 +74,7 @@ const DepartmentListTable : React.FC<{data : [] , sn : number , mutate : () => v
                 data={data}
                 columns={columns}
                 sn={1}
+                isLoading={isLoading}
                 searchKey="name"
                 showCheckbox={false}
                 mutate={mutate}

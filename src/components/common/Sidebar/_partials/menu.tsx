@@ -16,6 +16,8 @@ import {
   TooltipContent,
   TooltipProvider
 } from "@/components/ui/tooltip";
+import { useContext } from "react";
+import { AuthContext } from "@/helpers/contexts/AuthContextProvider";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -25,6 +27,7 @@ export function Menu({ isOpen }: MenuProps) {
   
   const pathname = usePathname();
   const menuList = getMenuList();
+  const { logout } = useContext(AuthContext)
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -137,7 +140,7 @@ export function Menu({ isOpen }: MenuProps) {
                   </Button>
                 </TooltipTrigger>
                 {isOpen === false && (
-                  <TooltipContent side="right">Sign out</TooltipContent>
+                  <TooltipContent side="right" onClick={() => logout()}>Sign out</TooltipContent>
                 )}
               </Tooltip>
             </TooltipProvider>

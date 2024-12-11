@@ -10,16 +10,22 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 }  from "@/components/ui/dropdown-menu"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import BranchActionModal from "./BranchActionModal"
+import { SettingsContext } from "@/helpers/contexts/AppSettingContextProvider"
 
 const BranchListTable : React.FC<{data : [] , sn : number , mutate : () => void}> = ({
     data , 
     sn , 
     mutate
 }) => {
+    const { calendar } = useContext(SettingsContext)
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    const [selectedRow, setSelectedRow] = useState(null)
+    const [selectedRow, setSelectedRow] = useState(null);
+
+    console.log(calendar);
+    console.log(data)
+
     const columns: ColumnDef<any>[] = [
         {
             accessorKey: "sn",
@@ -79,7 +85,11 @@ const BranchListTable : React.FC<{data : [] , sn : number , mutate : () => void}
                 )
             },
             cell: ({ row  } : { row : any }) => (
-            <div className="capitalize">{row.getValue("established_date")}</div>
+            <div className="capitalize">
+                {
+                    calendar == 'nepali' ? row.getValue("established_date_nepali") : row.getValue("established_date")
+                }
+            </div>
             ),
         },
         {

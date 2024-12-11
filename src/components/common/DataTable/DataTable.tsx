@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, Loader2 } from "lucide-react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -30,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import TableSkeleton from "@/components/elements/TableSkeleton"
 
 // Debounce hook
 const useDebounce = (callback: Function, delay: number) => {
@@ -63,6 +64,7 @@ interface DataTableProps<TData> {
   sn?: number
   customFilter?: React.ReactNode
   mutate?: () => void
+  isLoading?: boolean
 }
 
 export function DataTable<TData>({
@@ -72,23 +74,31 @@ export function DataTable<TData>({
   showCheckbox = false,
   actionDropdown,
   customFilter,
-  mutate
+  mutate,
+  isLoading = false
 }: DataTableProps<TData>) {
+
   const searchParams = useSearchParams()
   const router = useRouter()
   const [localFilter, setLocalFilter] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
-  // Debounced handlers
-  const debouncedUpdateURL = useDebounce((value: string) => {
-    const currentParams = new URLSearchParams(searchParams.toString());
-    currentParams.set('name', value);
-    router.replace(`?${currentParams.toString()}`);
-    mutate?.();
+  // Debounced handlers with loading state
+  const debouncedUpdateURL = useDebounce(async (value: string) => {
+    try {
+      setIsSearching(true);
+      const currentParams = new URLSearchParams(searchParams.toString());
+      currentParams.set('name', value);
+      router.replace(`?${currentParams.toString()}`);
+      await mutate?.();
+    } finally {
+      setIsSearching(false);
+    }
   }, 500);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,6 +123,7 @@ export function DataTable<TData>({
             checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
+            disabled={isLoading}
           />
         ),
         cell: ({ row }) => (
@@ -120,6 +131,7 @@ export function DataTable<TData>({
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
             aria-label="Select row"
+            disabled={isLoading}
           />
         ),
         enableSorting: false,
@@ -134,7 +146,7 @@ export function DataTable<TData>({
     }
 
     return cols
-  }, [userColumns, showCheckbox, actionDropdown])
+  }, [userColumns, showCheckbox, actionDropdown, isLoading])
 
   const table = useReactTable({
     data,
@@ -160,18 +172,26 @@ export function DataTable<TData>({
       <div className="flex items-center py-4">
         <div className="flex gap-2">
           {searchKey && (
-            <Input
-              placeholder={`Filter ${searchKey}...`}
-              value={localFilter}
-              onChange={handleFilterChange}
-              className="max-w-sm"
-            />
+            <div className="relative">
+              <Input
+                placeholder={`Filter ${searchKey}...`}
+                value={localFilter}
+                onChange={handleFilterChange}
+                className="max-w-sm"
+                disabled={isLoading}
+              />
+              {(isLoading || isSearching) && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
+              )}
+            </div>
           )}
           {customFilter}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-auto" disabled={isLoading}>
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -211,7 +231,9 @@ export function DataTable<TData>({
             ))}
           </TableHeader>
           <TableBody>
-            {data && table?.getRowModel()?.rows?.length ? (
+            {isLoading ? (
+              <TableSkeleton columns={finalColumns?.length} rows={5}/>
+            ) : data && table?.getRowModel()?.rows?.length ? (
               table?.getRowModel()?.rows.map((row) => (
                 <TableRow
                   key={row.id}

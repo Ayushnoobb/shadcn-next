@@ -61,7 +61,7 @@ const EmployeesIndexPage : React.FC = () => {
                         />
                     </div>
                     <ContentContainer>
-                        <EmployeeListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
+                        <EmployeeListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate} isLoading={isLoading}/>
                         <Paginator
                             currentPage={AllBrachList?.meta?.current_page}
                             totalPages={AllBrachList?.meta?.current_page}

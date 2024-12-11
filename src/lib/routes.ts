@@ -13,4 +13,5 @@ export const routes  = {
   BRANCH_ACTION : '/employees/branches/action',
   DEPARTMENT_INDEX : '/employees/departments' ,
   DEPARTMENT_ACTION : '/employees/departments/action',
+  SETTINGS_INDEX : '/settings'
 }

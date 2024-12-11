@@ -5,4 +5,11 @@ export const collectionToOptions = (data: Record<string, string>[]) => {
         label: item?.title ? item.title : item?.name,
       }))
       : [];
-  };
+};
+
+export const objectToOptions = (options: Record<string, string>): any[] => {
+  return Object.entries(options).map(([value, label]) => ({
+    value,
+    label,
+  }));
+};
