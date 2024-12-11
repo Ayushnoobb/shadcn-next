@@ -1,12 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Check, ChevronsUpDown, Loader2, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { ChoiceType } from "@/helpers/commonSchema/common.schema";
+import AsyncSelect from 'react-select/async';
+import React, { useEffect, useRef } from 'react';
+import { ChoiceType } from '@/helpers/commonSchema/common.schema';
+import { Label } from '../ui/label';
+import { StylesConfig } from 'node_modules/react-select/dist/declarations/src';
 
 interface SelectFieldProps {
   className?: string;
@@ -24,26 +20,26 @@ interface SelectFieldProps {
   clearSelectValue?: boolean;
   setClearSelectValue?: React.Dispatch<React.SetStateAction<boolean>>;
   isDisabled?: boolean;
-  onChange?: (choice: ChoiceType | any) => void;
-  loadOptions?: (inputValue: string, callback: (options: any[]) => void) => Promise<void>;
-  placeHolder?: string;
-  labelClassName?: string;
-  defaultOptions?: { value: string | number; label: string }[];
-  isMulti?: boolean;
-  getOptionLabel?: (option: any) => string;
-  isClearable?: boolean;
+  onChange?: (choice: ChoiceType) => void | any;
+  loadOptions? :  (inputValue: string, callback: (options: any[]) => void) => Promise<void> | any
+  placeHolder? : string
+  labelClassName? : string
+  defaultOptions? : { value: string | number; label: string }[]
+  isMulti? : boolean
 }
 
+
 const AsyncSelectField: React.FC<SelectFieldProps> = ({
-  className = "",
+  className = '',
   id,
   label,
   labelStyle,
+  labelWidth,
   name,
   defaultValue,
   value,
   required,
-  wrapperClassName = "",
+  wrapperClassName = '',
   fieldErrors = [],
   clearSelectValue = false,
   setClearSelectValue,
@@ -51,174 +47,119 @@ const AsyncSelectField: React.FC<SelectFieldProps> = ({
   onChange,
   loadOptions,
   placeHolder,
-  labelClassName,
-  defaultOptions = [],
-  isMulti = false,
-  getOptionLabel,
-  isClearable = true,
+  labelClassName ,
+  defaultOptions ,
+  isMulti = false ,
 }) => {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [options, setOptions] = useState(defaultOptions);
-  const [selectedItems, setSelectedItems] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  
-  const selectRef = useRef<HTMLButtonElement>(null);
+  if (labelStyle === 'label-left') {
+    wrapperClassName = wrapperClassName.concat(
+      ' ',
+      ' flex justify-between items-center gap-4 '
+    );
+  }
+
+  const selectRef = useRef<any>(null);
 
   useEffect(() => {
     if (clearSelectValue) {
-      setSelectedItems([]);
-      setClearSelectValue?.(false);
+      selectRef?.current?.clearValue?.();
+      setClearSelectValue && setClearSelectValue(false);
     }
   }, [clearSelectValue, setClearSelectValue]);
 
-  useEffect(() => {
-    const loadInitialOptions = async () => {
-      if (loadOptions && defaultOptions.length === 0) {
-        setLoading(true);
-        await loadOptions("", (loadedOptions) => {
-          setOptions(loadedOptions);
-        });
-        setLoading(false);
+  // useEffect(() => {
+  //   // Auto-select the first option if available
+  //   if (!selectedValue && defaultOptions && defaultOptions.length > 0) {
+  //     const firstOption = defaultOptions[0];
+  //     setSelectedValue(firstOption);
+  //     onChange && onChange(firstOption);
+  //   }
+  // }, [defaultOptions, selectedValue, onChange]);
+
+  const styles = {
+    menuList: (base: any , state  :any) => ({
+      ...base,
+      borderColor : state?.isFocused && 'bg-[var(--primary)]',
+      colourStyles : '#fff',
+      '::-webkit-scrollbar': {
+        width: '5px',
+      },
+      '::-webkit-scrollbar-track': {
+        background: '#f1f1f1',
+      },
+      '::-webkit-scrollbar-thumb': {
+        background: '#d1d1d1',
+      },
+      '::-webkit-scrollbar-thumb:hover': {
+        background: '#555',
+      },
+    }),
+    input: (base:any, state : any) => ({
+      ...base,
+      '[type="text"]': {
+        fontSize: 13,
+        fontWeight: 900,
+        color: 'green'
       }
-    };
-    loadInitialOptions();
-  }, [loadOptions, defaultOptions]);
-
-  const handleSearch = async (value: string) => {
-    setSearchQuery(value);
-    if (loadOptions) {
-      setLoading(true);
-      await loadOptions(value, (loadedOptions) => {
-        setOptions(loadedOptions);
-      });
-      setLoading(false);
-    }
+    })
   };
 
-  const handleSelect = (item: any) => {
-    let newSelectedItems;
-    if (isMulti) {
-      if (selectedItems.some((i) => i.value === item.value)) {
-        newSelectedItems = selectedItems.filter((i) => i.value !== item.value);
-      } else {
-        newSelectedItems = [...selectedItems, item];
-      }
-      setSelectedItems(newSelectedItems);
-    } else {
-      newSelectedItems = [item];
-      setSelectedItems(newSelectedItems);
-      setOpen(false);
-    }
-    onChange?.(isMulti ? newSelectedItems : newSelectedItems[0]);
-  };
-
-  const removeItem = (itemToRemove: any) => {
-    const newSelectedItems = selectedItems.filter(
-      (item) => item.value !== itemToRemove.value
-    );
-    setSelectedItems(newSelectedItems);
-    onChange?.(isMulti ? newSelectedItems : null);
-  };
-
-  const wrapperClasses = cn(
-    wrapperClassName,
-    labelStyle === "label-left" && "flex justify-between items-center gap-4"
-  );
+  const colourStyles: StylesConfig<any> = {
+    control: (styles) => ({ ...styles, backgroundColor: 'white' }),
+    option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+      return {
+        ...styles,
+        backgroundColor:'hsl(var(--background))',
+        color:'#fff'
+      };
+    },
+    
+    // input: (styles) => ({ ...styles, ...dot() }),
+    // placeholder: (styles) => ({ ...styles, ...dot('#ccc') }),
+    // singleValue: (styles, { data }) => ({ ...styles, ...dot(data.color) }),
+  };  
 
   return (
-    <div className={wrapperClasses}>
+    <div className={`${wrapperClassName}`}>
       {label && (
-        <Label htmlFor={id ?? name} className={labelClassName}>
+        <Label id={id ?? name}  className={labelClassName}>
           {label}
-          {required && <span className="text-destructive ml-1">*</span>}
+          {required ? <span className="text-error-400"> *</span> : ''}
         </Label>
       )}
-      <div className="w-full">
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              ref={selectRef}
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className={cn(
-                "w-full justify-between",
-                !selectedItems.length && "text-muted-foreground",
-                className
-              )}
-              disabled={isDisabled}
-            >
-              <div className="flex gap-1 flex-wrap">
-                {selectedItems.length > 0 ? (
-                  isMulti ? (
-                    selectedItems.map((item) => (
-                      <Badge
-                        variant="secondary"
-                        key={item.value}
-                        className="mr-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeItem(item);
-                        }}
-                      >
-                        {getOptionLabel ? getOptionLabel(item) : item.label}
-                        {isClearable && (
-                          <X className="ml-1 h-3 w-3 hover:text-destructive" />
-                        )}
-                      </Badge>
-                    ))
-                  ) : (
-                    getOptionLabel
-                      ? getOptionLabel(selectedItems[0])
-                      : selectedItems[0].label
-                  )
-                ) : (
-                  placeHolder || "Select..."
-                )}
-              </div>
-              {loading ? (
-                <Loader2 className="ml-2 h-4 w-4 shrink-0 opacity-50 animate-spin" />
-              ) : (
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
-            <Command>
-              <CommandInput
-                placeholder="Search..."
-                value={searchQuery}
-                onValueChange={handleSearch}
-              />
-              <CommandEmpty>No options found</CommandEmpty>
-              <CommandGroup className="max-h-64 overflow-auto">
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    onSelect={() => handleSelect(option)}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedItems.some((item) => item.value === option.value)
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {getOptionLabel ? getOptionLabel(option) : option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
+      <div className="w-full mt-2">
+        <AsyncSelect
+          cacheOptions
+          isMulti={isMulti}
+          loadOptions={loadOptions}
+          defaultOptions={defaultOptions}
+          ref={selectRef}
+          styles={styles}
+          isDisabled={isDisabled}
+          onChange={onChange}
+          className={className + 'bg-[var(--primary)]' + ' !text-sm'}
+          theme={(theme) => ({
+            ...theme,
+            borderRadius: 0,
+            colors: {
+              ...theme.colors,
+              backgroundColor: 'hsl(var(--background))' ,
+              primary25: 'hsl(var(--secondary))',
+              primary: 'hsl(var(--secondary))',
+              color : '#fff'
+            },
+          })}
+          name={name}
+          defaultValue={defaultValue}
+          placeholder={placeHolder}
+          isDiabled={isDisabled}
 
-        {fieldErrors.map((error, index) => (
-          <span key={index} className="block text-destructive text-xs mt-1">
-            {error}
-          </span>
-        ))}
+        />
+        <span className="block text-error-500 text-xs my-1">
+          {fieldErrors.map((item: string, index: any) => (
+            <span key={index}>{item}</span>
+          ))}
+        </span>
       </div>
     </div>
   );

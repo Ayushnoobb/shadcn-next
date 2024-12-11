@@ -28,16 +28,16 @@ const DropZone  :React.FC<DropZonePropsInterface> = ({
 })
 
   return (
-    <>
+    <div className='flex flex-col gap-4'>
         <Label>
             {title}
         </Label>
-        <div {...getRootProps({ className: 'dropzone' })}>
+        <div {...getRootProps({ className: 'dropzone' })} className='bg-gray-100 border-gray-400 border border-dashed px-4 py-8 rounded'>
             <input {...getInputProps()} />
             <p>Drag 'n' drop some files here, or click to select files</p>
             <em>(Only *.jpeg and *.png images will be accepted)</em>
       </div>
-    </>
+    </div>
   )
 }
 

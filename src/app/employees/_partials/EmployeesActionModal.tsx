@@ -83,8 +83,8 @@ const EmployeesActionModal: React.FC<EmployeesActionModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="md:max-w-[50vw] w-full max-h-full overflow-y-auto custom-scrollbar min-h-[90vh]">
-        <DialogHeader>
+      <DialogContent className="md:max-w-[50vw] w-full max-h-full overflow-y-auto custom-scrollbar  max-h-[100vh] overflow-x-hidden">
+        <DialogHeader className="h-fit">
           <DialogTitle>{mode === "add" ? "Add New Employee" : "Edit Employee"}</DialogTitle>
         </DialogHeader>
           <MultiStepForm steps={steps} renderContent={renderContent}/>

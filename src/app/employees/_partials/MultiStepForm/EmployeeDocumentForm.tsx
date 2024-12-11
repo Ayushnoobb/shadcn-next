@@ -63,11 +63,12 @@ const EmployeeDocumentsForm = ({
   return (
     <FormSection title="Employee Documents">
       <form onSubmit={handleFormSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <div className="grid grid-cols-1  gap-4 mt-6">
             <DropZone 
                 title="Citizenship Front"
                 handleFileChange={handleFileChange}
                 name="citizenship_front"
+                
             />
             <DropZone 
                 title="Citizenship Back"

@@ -110,6 +110,7 @@ const DepartmentListTable : React.FC<{data : [] , sn : number , mutate : () => v
                 sn={1}
                 searchKey="name"
                 showCheckbox={false}
+                mutate={mutate}
                 actionDropdown={{
                     id: "actions",
                     enableHiding: false,

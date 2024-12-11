@@ -17,13 +17,18 @@ import DepartmentListTable from "./_partials/DepartmnetListTable"
 import AppContextProvider from "@/helpers/contexts/AppContextProvider"
 import { defaultFetcher } from "@/helpers/fetch.helper"
 import { routes } from "@/lib/routes"
+import { useSearchParams } from "next/navigation"
 
 const DepartmentListIndex = () => {
 
+    const searchParams = useSearchParams()
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
     const AllBrachListURL = `${process.env.NEXT_PUBLIC_HRMS_HOST}/api/branch/list`
-    const { data : AllBrachList , isLoading , mutate} = useSWR(AllBrachListURL , defaultFetcher)
+    const { data : AllBrachList , isLoading , mutate} = useSWR(
+        searchParams.toString() == '' ? AllBrachListURL : AllBrachListURL + `?${searchParams.toString()}` , 
+        defaultFetcher
+    )
     
     return(
         <>
@@ -63,9 +68,9 @@ const DepartmentListIndex = () => {
                         </div>
                         <ContentContainer>
                             {
-                                !isLoading ? (
-                                    <DepartmentListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
-                                ) : 'loading ...'
+                                // !isLoading ? (
+                                // ) : 'loading ...'
+                                <DepartmentListTable data={AllBrachList?.data} sn={AllBrachList?.meta?.from} mutate={mutate}/>
                             }
                             <Paginator 
                                 currentPage={1}

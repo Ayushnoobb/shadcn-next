@@ -1,4 +1,6 @@
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { ChevronDown } from "lucide-react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -11,8 +13,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ChevronDown } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -31,6 +31,29 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+// Debounce hook
+const useDebounce = (callback: Function, delay: number) => {
+  const timeoutRef = React.useRef<NodeJS.Timeout>();
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return useCallback((...args: any[]) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]);
+};
+
 interface DataTableProps<TData> {
   data: TData[]
   columns: ColumnDef<TData>[]
@@ -38,7 +61,8 @@ interface DataTableProps<TData> {
   showCheckbox?: boolean
   actionDropdown?: any
   sn?: number
-  customFilter? : React.ReactNode
+  customFilter?: React.ReactNode
+  mutate?: () => void
 }
 
 export function DataTable<TData>({
@@ -46,18 +70,41 @@ export function DataTable<TData>({
   columns: userColumns,
   searchKey,
   showCheckbox = false,
-  actionDropdown , 
-  customFilter
+  actionDropdown,
+  customFilter,
+  mutate
 }: DataTableProps<TData>) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [localFilter, setLocalFilter] = useState("")
+
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
+  // Debounced handlers
+  const debouncedUpdateURL = useDebounce((value: string) => {
+    const currentParams = new URLSearchParams(searchParams.toString());
+    currentParams.set('name', value);
+    router.replace(`?${currentParams.toString()}`);
+    mutate?.();
+  }, 500);
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setLocalFilter(value);
+    
+    if (searchKey) {
+      table.getColumn(searchKey)?.setFilterValue(value);
+    }
+    
+    debouncedUpdateURL(value);
+  };
+
   const finalColumns: ColumnDef<TData>[] = React.useMemo(() => {
     let cols: ColumnDef<TData>[] = []
     
-    // Add checkbox column if enabled
     if (showCheckbox) {
       cols.push({
         id: "select",
@@ -80,10 +127,8 @@ export function DataTable<TData>({
       })
     }
 
-    // Add user-defined columns
     cols = [...cols, ...userColumns]
 
-    // Add actions column if dropdown is provided
     if (actionDropdown) {
       cols.push(actionDropdown)
     }
@@ -117,10 +162,8 @@ export function DataTable<TData>({
           {searchKey && (
             <Input
               placeholder={`Filter ${searchKey}...`}
-              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn(searchKey)?.setFilterValue(event.target.value)
-              }
+              value={localFilter}
+              onChange={handleFilterChange}
               className="max-w-sm"
             />
           )}
@@ -136,22 +179,20 @@ export function DataTable<TData>({
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
+              .map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border ">
+      <div className="rounded-md border">
         <Table className="custom-scrollbar">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -202,3 +243,5 @@ export function DataTable<TData>({
     </div>
   )
 }
+
+export default DataTable;
